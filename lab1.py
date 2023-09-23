@@ -19,13 +19,40 @@ class Expression:
 
     def __init__(self, expr: str) -> None:
         expr=expr.replace(' ', '')
-        if expr.startswith('(') and expr.endswith(')'):
-            expr = expr[1:-1]
         expr=expr.replace('pow','')
         expr=expr.replace(',',')^(')
+        self.check_operands_validity(expr)
+        if expr.startswith('(') and expr.endswith(')'):
+            br_stack=['(']
+            for i in range(1,len(expr)):
+                if expr[i]=='(':
+                    br_stack.append('(')
+                elif expr[i]==')':
+                    br_stack.pop()
+                if not br_stack and i!=len(expr)-1:
+                    break
+            else:
+                expr = expr[1:-1]
         self.operation = None
         self.expression = expr
         self.child_expressions = {}
+    
+    def check_operands_validity(self, expr:str):
+        if 'n' in expr:
+            raise Exception('Wrong input symbol \'n\' is not allowed ')
+        raw_expr=expr.replace('(-','n').replace('(','').replace(')','')
+        operands=[raw_expr]
+        for operation in Operation:
+            if operation == Operation.NEGATIVE or operation == Operation.NONE:
+                continue
+            new_operands=[]
+            for operand in operands:
+                new_operands+=operand.split(operation.value)
+            operands=new_operands
+        print(f'{operands=}')
+        if any(map(lambda op: not re.match(r'^n?[0-9]+(?:\.[0-9]+)?$', op), operands)):
+            raise Exception('Unsupported operand')
+    
 
     def iterate_over_operations(self, regex):
         while re.search(regex, self.expression):

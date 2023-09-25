@@ -21,6 +21,7 @@ class Expression:
         expr=expr.replace(' ', '')
         expr=expr.replace('pow','')
         expr=expr.replace(',',')^(')
+        expr=re.sub(r'^(-[0-9]+(?:\.[0-9]+)?)', '(\\1)', expr)
         self.check_operands_validity(expr)
         if expr.startswith('(') and expr.endswith(')'):
             br_stack=['(']
@@ -50,7 +51,7 @@ class Expression:
                 new_operands+=operand.split(operation.value)
             operands=new_operands
         print(f'{operands=}')
-        if any(map(lambda op: not re.match(r'^n?[0-9]+(?:\.[0-9]+)?$', op), operands)):
+        if any(map(lambda op: not re.match(r'^n*[0-9]+(?:\.[0-9]+)?$', op), operands)):
             raise Exception('Unsupported operand')
     
 
@@ -62,15 +63,13 @@ class Expression:
         print(f"exited with {self.expression}")
 
     def parse_expression(self):
+        print(f"Parsing {self.expression=}")
         if self.expression.isdigit() or re.match(r'^[0-9]+\.[0-9]+$', self.expression):
             self.operation = Operation.NONE
             regex=r'^[0-9]+\.[0-9]+$'
             print(f"Set operation to NONE for {self.expression} [{self.expression.isdigit()=}, {re.match(regex, self.expression)}]")
             return
-        if re.match(r'-[0-9]+\.[0-9]+', self.expression):
-            self.operation = Operation.NEGATIVE
-            self.expression = self.expression[1:]
-            return
+        
         brackets_stack = []
         current_bracket = ''
         expression_copy = self.expression
@@ -91,16 +90,29 @@ class Expression:
             if brackets_stack:
                 current_bracket += char
         print(expression_copy, self.child_expressions)
-
         if brackets_stack:
             raise IndexError("Wrong brackets")
         self.expression = expression_copy
+        print(f"checking if unMinus {self.expression=}")
+        if re.match(r'^-[0-9]+(?:\.[0-9]+)?|-[A-Z]', self.expression):
+            self.operation = Operation.NEGATIVE
+            self.expression = self.expression[1:]
+            return
 
     def calculate_expression(self) -> float:
+        print(f"calculating expression {self.expression} {self.operation} {self.child_expressions}")
         if self.operation is not None:
             if self.operation == Operation.NONE:
                 return float(self.expression)
             if self.operation == Operation.NEGATIVE:
+                if self.expression.isalpha():
+                    calc=Expression(self.child_expressions[self.expression])
+                    calc.parse_expression()
+                    self.expression=calc.calculate_expression()
+                if not re.match("^([0-9]+(?:\.[0-9]+)?)$", self.expression):
+                    calc=Expression(self.expression)
+                    calc.parse_expression()
+                    self.expression=calc.calculate_expression()
                 return 0 - float(self.expression)
         print("CALCULATING POW")
         for op1, op2 in self.iterate_over_operations(
@@ -120,7 +132,7 @@ class Expression:
         try:
             return self.decode_values(self.expression)[0]
         except ValueError:
-            raise Exception('Wrong input')
+            raise Exception('Unsupported character')
 
     def insert_value(self, op1: float, operator: str, op2: float):
         if operator == Operation.ADDITION.value:
@@ -133,6 +145,8 @@ class Expression:
             res = op1 / op2
         elif operator == Operation.POW.value:
             res = op1 ** op2
+            if type(res) is complex:
+                raise Exception("Complex numbers are not supported")
         else:
             raise Exception(f'Unsupported operation {operator}')
         if res < 0:

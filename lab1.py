@@ -51,8 +51,11 @@ class Expression:
                 new_operands+=operand.split(operation.value)
             operands=new_operands
         print(f'{operands=}')
-        if any(map(lambda op: not re.match(r'^n*[0-9]+(?:\.[0-9]+)?$', op), operands)):
-            raise Exception('Unsupported operand')
+        for operand in operands:
+            if not operand:
+                raise Exception('No operand found for operation')
+            if not re.match(r'^n*[0-9]+(?:\.[0-9]+)?$', operand):
+                raise Exception(f'Unsupported operand {operand}')
     
 
     def iterate_over_operations(self, regex):
@@ -182,4 +185,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    while True:
+        main()

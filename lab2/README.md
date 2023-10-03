@@ -6,35 +6,35 @@
 
 *Конечный автомат* представляет собой пятерку
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.001.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.001.png)
 
 где, *Q* - конечное множество состояний автомата,
 
 *T* - непустое конечное множество входных символов, входной алфавит,
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.002.png) - *начальное состояние*,
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.002.png) - *начальное состояние*,
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.003.png) - непустое множество заключительных состояний автомата,
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.003.png) - непустое множество заключительных состояний автомата,
 
 *t*- переходная функция
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.004.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.004.png)
 
-Такой автомат работает как распознаватель следующим образом (рис.1). На ленте записана входная строка, ограниченная с двух сторон концевыми маркерами. Управляющее устройство находится в начальном состоянии ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.005.png). Входная лента последовательно просматривается слева направо по одному символу. Допустим, что с помощью считывающей головки оказались просмотрены символы ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.006.png) и управляющее устройство находится в состоянии ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.007.png). Символ ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.008.png) допускается, если существует хотя бы одно состояние ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.009.png).
+Такой автомат работает как распознаватель следующим образом (рис.1). На ленте записана входная строка, ограниченная с двух сторон концевыми маркерами. Управляющее устройство находится в начальном состоянии ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.005.png). Входная лента последовательно просматривается слева направо по одному символу. Допустим, что с помощью считывающей головки оказались просмотрены символы ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.006.png) и управляющее устройство находится в состоянии ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.007.png). Символ ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.008.png) допускается, если существует хотя бы одно состояние ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.009.png).
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.010.png "Fig 1")
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.010.png "Fig 1")
 
 Рис. 1
 
 Если такого состояния не существует, автомат останавливает свою работу. В общем случае таких состояний может быть несколько, и распознаватель будет недетерминированным, т.е. речь в этом случае будет идти о *недетерминированном конечном автомате*.
 
-Строка ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.011.png) допускается автоматом, если существует последовательность состояний ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.012.png), такая, что ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.013.png), где ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.014.png) и после прочтения последнего символа ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.015.png) строки был встречен концевой маркер. Предполагается, что начальный маркер читается в состоянии ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.005.png). Этот факт можно записать с помощью функции перехода следующим образом: ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.016.png). В этом случае функцию перехода, соответствующую одному такту работы распознавателя, можно рассматривать, как частный случай ее общей формы записи для строки *x,* содержащей один символ ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.017.png) и состояния ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.018.png). Таким образом, функцию *t* можно определить рекурсивно ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.019.png), если строка ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.020.png), где ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.021.png) и ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.022.png).
+Строка ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.011.png) допускается автоматом, если существует последовательность состояний ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.012.png), такая, что ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.013.png), где ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.014.png) и после прочтения последнего символа ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.015.png) строки был встречен концевой маркер. Предполагается, что начальный маркер читается в состоянии ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.005.png). Этот факт можно записать с помощью функции перехода следующим образом: ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.016.png). В этом случае функцию перехода, соответствующую одному такту работы распознавателя, можно рассматривать, как частный случай ее общей формы записи для строки *x,* содержащей один символ ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.017.png) и состояния ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.018.png). Таким образом, функцию *t* можно определить рекурсивно ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.019.png), если строка ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.020.png), где ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.021.png) и ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.022.png).
 
 Множество всех строк *T(A)*, допускаемых автоматом *A*, может быть записано в виде
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.023.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.023.png)
 
-Практика показала, что одним из удобных способов задания функции переходов является *граф переходов* или его еще называют *граф состояний*. Граф состояний ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.024.png) является направленным графом и строится следующим образом:
+Практика показала, что одним из удобных способов задания функции переходов является *граф переходов* или его еще называют *граф состояний*. Граф состояний ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.024.png) является направленным графом и строится следующим образом:
 
 Каждому состоянию множества *Q* соответствует одна вершина множества *V*.
 
@@ -44,69 +44,69 @@
 
 Заключительная вершина изображается прямоугольником.
 
-Ребро ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.025.png) существует на графе, если для символа ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.021.png) и состояния ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.026.png) значение функции ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.027.png) не пусто и равно ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.028.png). 
+Ребро ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.025.png) существует на графе, если для символа ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.021.png) и состояния ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.026.png) значение функции ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.027.png) не пусто и равно ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.028.png). 
 
 На рис. 2 изображен граф состояний автомата *A*.
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.029.png), где
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.029.png), где
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.030.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.030.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.031.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.031.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.032.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.032.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.033.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.033.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.034.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.034.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.035.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.035.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.036.png "Fig 1")
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.036.png "Fig 1")
 
 Рис. 2
 
 Рассмотрим еще один пример грамматики, порождающей следующие предложения языка
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.037.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.037.png)
 
 Построим для этой грамматики конечный автомат. Граф его состояний приведен на рис. 3. 
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.038.png "Fig 1")
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.038.png "Fig 1")
 
 Рис. 3
 
 По графу видно, что конечный автомат недетерминированный, поскольку из состояния *S* выходят два ребра с символом *a*. Функция перехода для символа *a* в состоянии *S* имеет два значения.
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.039.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.039.png)
 
-Как известно, недетерминированный автомат достаточно сложно использовать для разбора. Поэтому интересует возможность преобразования недетерминированного автомата в детерминированный. Для конечных автоматов этот вопрос решается положительно. Доказано, что, если *A* - недетерминированный автомат, то существует детерминированный автомат *A'*, такой, что ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.040.png). Допустим, что функция переходов ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.041.png) имеет множество значений ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.042.png). Будем считать это множество одним новым состоянием *q'*. Присоединим это состояние к множеству состояний *Q* автомата, т.е. ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.043.png). Определим функцию перехода для нового состояния *q'*.
+Как известно, недетерминированный автомат достаточно сложно использовать для разбора. Поэтому интересует возможность преобразования недетерминированного автомата в детерминированный. Для конечных автоматов этот вопрос решается положительно. Доказано, что, если *A* - недетерминированный автомат, то существует детерминированный автомат *A'*, такой, что ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.040.png). Допустим, что функция переходов ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.041.png) имеет множество значений ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.042.png). Будем считать это множество одним новым состоянием *q'*. Присоединим это состояние к множеству состояний *Q* автомата, т.е. ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.043.png). Определим функцию перехода для нового состояния *q'*.
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.044.png) для всех ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.021.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.044.png) для всех ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.021.png)
 
 Выполнив данное преобразование для всех функций перехода, имеющих не единственное значение, получим детерминированный автомат. Запишем для приведенного выше примера все функции перехода.
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.039.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.039.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.045.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.045.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.046.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.046.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.047.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.047.png)
 
-Введем новое состояние ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.048.png) и перепишем функции перехода.
+Введем новое состояние ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.048.png) и перепишем функции перехода.
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.049.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.049.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.045.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.045.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.050.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.050.png)
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.051.png) так как одно состояние из ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.052.png) *f* - конечное, а ![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.050.png)
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.051.png) так как одно состояние из ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.052.png) *f* - конечное, а ![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.050.png)
 
 Граф состояний полученного детерминированного автомата показан на рис. 4.
 
-![](Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.053.png "Fig 1")
+![](pictures/Aspose.Words.cf25b0ba-a341-40a3-a98e-67faf93ea5e6.053.png "Fig 1")
 
 Рис. 4
 

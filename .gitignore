@@ -1,0 +1,5 @@
+/lab2/lib/
+/venv
+/lab2/*.html
+*__pycache__*
+.idea

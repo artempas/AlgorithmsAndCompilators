@@ -58,7 +58,7 @@ class State:
         return determined
 
     def consume_symbol(self, symbol: str) -> "State":
-        if symbol not in self.__outgoing_transitions:
+        if not self.__outgoing_transitions.get(symbol):
             raise ValueError(f"No transition found from state {self.name} for symbol {symbol}")
         if len(self.__outgoing_transitions[symbol]) > 1:
             logger.warning(f"More than one transitions from state {self.name} with symbol {symbol} exists.")

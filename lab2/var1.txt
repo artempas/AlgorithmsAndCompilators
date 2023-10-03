@@ -22,4 +22,31 @@ q10,3=q11
 q11,5=q12
 q12, =f0
 
-;aa + cd*ee=357
+;aa+cd*=35
+;ab+cd*=35
+;ba+cd*=35
+;aa+cd*e35
+;ab+cd*e35
+;ba+cd*e35
+;aa+cd*eeee=35
+;aa+cd*eeee=35
+;ab+cd*eeee=35
+;ab+cd*e=35
+;ba+cd*e=35
+;ba+cd*e=35
+
+;DOWN IS WRONG
+;
+;aa+cd*=3
+;ab+cd*=3
+;ba+cd*=3
+;aa+cd*e3
+;ab+cd*e3
+;ba+cd*e3
+;aa+cd*eeee=3
+;aa+cd*eeee=3
+;ab+cd*eeee=3
+;ab+cd*e=3
+;ba+cd*e=3
+;ba+cd*e=3
+;c

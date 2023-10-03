@@ -64,7 +64,11 @@ class StateMachine:
     def print_graph(self, filename: str, is_new=False):
         self.graph = Network(directed=True)
         if not is_new:
-            self.graph.add_nodes(list(self.states.keys()), color=list(map(lambda i: i.color, self.states.values())))
+            self.graph.add_nodes(
+                list(self.states.keys()),
+                shape=["circle"] * len(self.states),
+                color=list(map(lambda i: i.color, self.states.values())),
+            )
             table = PrettyTable(field_names=["STATE", "SYMBOL", "DESTINATION STATE"])
             graph = {}
             for transition in self.transitions:
@@ -74,11 +78,14 @@ class StateMachine:
                     graph[(transition.from_state.name, transition.to_state.name)] = {
                         "label": transition.symbol,
                         "color": transition.color,
+                        "font": {"size": 20},
                     }
                 table.add_row([transition.from_state.name, transition.symbol, transition.to_state.name])
         else:
             self.graph.add_nodes(
-                list(self.new_states.keys()), color=list(map(lambda i: i.color, self.new_states.values()))
+                list(self.new_states.keys()),
+                shape=["circle"] * len(self.new_states),
+                color=list(map(lambda i: i.color, self.new_states.values())),
             )
             table = PrettyTable(field_names=["STATE", "SYMBOL", "DESTINATION STATE"])
             graph = {}
@@ -89,6 +96,7 @@ class StateMachine:
                     graph[(transition.from_state.name, transition.to_state.name)] = {
                         "label": transition.symbol,
                         "color": transition.color,
+                        "font": {"size": 20},
                     }
                 table.add_row([transition.from_state.name, transition.symbol, transition.to_state.name])
         for edge, options in graph.items():
@@ -112,6 +120,20 @@ class StateMachine:
             return False
         self.__determine_transitions()
         return True
+
+    def consume_string(self, string: str, new: bool) -> bool:
+        states = self.new_states if new else self.states
+        for init_state in [i for i in states.values() if i.is_initial]:
+            current_state = init_state
+            for char in string:
+                try:
+                    current_state = current_state.consume_symbol(char)
+                except ValueError:
+                    break
+            else:
+                if current_state.is_final:
+                    return True
+        return False
 
     def __eliminate_empty_transitions(self):
         # Remove all nodes that has only empty transitions incoming
@@ -146,13 +168,19 @@ class StateMachine:
         states_powerset = powerset(set((self.states.values())))
         for new_state in states_powerset:
             self.__process_subset(new_state)
-        for name, state in list(self.new_states.items()).copy():
-            if (state.is_sink and not state.is_final) or (state.is_unreachable and not state.is_initial):
-                self.__delete_state(state, True)
-            else:
-                logger.debug(
-                    f"State {state} should not be deleted ({state.is_sink=} {state.is_unreachable=} {state.is_initial=} {state.is_final=}"
-                )
+        while any(
+            [
+                (state.is_sink and not state.is_final) or (state.is_unreachable and not state.is_initial)
+                for state in self.new_states.values()
+            ]
+        ):
+            for name, state in list(self.new_states.items()).copy():
+                if (state.is_sink and not state.is_final) or (state.is_unreachable and not state.is_initial):
+                    self.__delete_state(state, True)
+                else:
+                    logger.debug(
+                        f"State {state} should not be deleted ({state.is_sink=} {state.is_unreachable=} {state.is_initial=} {state.is_final=}"
+                    )
 
     def __process_subset(self, subset: tuple[State]):
         new_node_name = get_node_name_by_subset(subset)

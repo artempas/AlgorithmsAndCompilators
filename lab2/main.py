@@ -2,9 +2,11 @@ import os
 import re
 import logging
 
+from prettytable import PrettyTable
+
 from StateMachine import StateMachine
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("main")
 
 from State import State
@@ -39,7 +41,7 @@ def process_line(states: dict[str, State], line: str) -> bool:
 
 
 def main():
-    files = [i for i in os.listdir() if re.match(".*.txt$", i)]
+    files = [i for i in os.listdir() if re.match(".*.txt$", i) and i != "requirements.txt"]
     print("Choose file to process")
     for n, filename in enumerate(files):
         print(f"{n}. {filename}")
@@ -47,7 +49,6 @@ def main():
     while not filename:
         try:
             inp = int(input())
-            # inp=0
             filename = files[inp]
         except Exception:
             print("Incorrect input")
@@ -55,12 +56,12 @@ def main():
     strings_to_process = process_file(filename, state_machine)
     state_machine.print_graph(filename + ".html")
     is_new = state_machine.determine()
+    table = PrettyTable(["String", "Is accepted"])
+    for string in strings_to_process:
+        result = state_machine.consume_string(string, is_new)
+        table.add_row([string, result])
+    print(table)
     state_machine.print_graph(filename + "_processed.html", is_new)
-
-    # for string in strings_to_process:
-    #     result = process_line(states, string)
-    #     print(f"Line {string.__repr__()} is " + ("accepted" if result else "not accepted"))
-    # print_graph(states, filename, True)
 
 
 if __name__ == "__main__":

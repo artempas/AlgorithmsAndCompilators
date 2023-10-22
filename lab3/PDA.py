@@ -59,6 +59,10 @@ class PushdownAutomata:
                     PDA.string_to_process = line[1:]
         return PDA
 
+    @property
+    def is_determined(self):
+        return not any(len(i) > 1 for i in self.transitions.values())
+
     def add_transition(self, stack_symbol: str, new_states: set[str]):
         if stack_symbol in self.transitions:
             self.transitions[stack_symbol] = self.transitions[stack_symbol].union(new_states)

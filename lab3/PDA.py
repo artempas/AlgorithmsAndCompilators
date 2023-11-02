@@ -77,6 +77,7 @@ class PushdownAutomata:
             self.stack = ['E']
         if self.path:
             logger.info('Path is not empty, emptying')
+            self.path=[]
         if string_to_process is not None:
             self.string_to_process = string_to_process
         else:

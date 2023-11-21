@@ -8,13 +8,12 @@ logger=getLogger('Nonterminal')
 
 @dataclass    
 class Token:
-    isTerminal:bool
+    isNonTerminal:bool
     text:str
 
 class Nonterminal:    
 
     def __init__(self, name:str, rules:list[str]) -> None:
-        print(rules)
         self.name=name
         self.rules=self._parse_rules(rules)
         print(f"Created Nonterminal {name}. Rules are: {self.rules}")
@@ -31,11 +30,11 @@ class Nonterminal:
                 if not (is_processing_terminal or is_processing_nonterminal):
                     if char=='<':
                         is_processing_nonterminal=True
-                        current_token=Token(isTerminal=True, text='')
+                        current_token=Token(isNonTerminal=True, text='')
                         continue
                     elif char=='\'':
                         is_processing_terminal=True
-                        current_token=Token(isTerminal=False,text='')
+                        current_token=Token(isNonTerminal=False,text='')
                         continue
                     elif char!=' ':
                         raise ValueError(f'Unexpected token {char} in rule {rule} (Terminal {self.name})')
@@ -49,11 +48,12 @@ class Nonterminal:
                         continue
                 if is_processing_nonterminal:
                     if char=='>':
-                        is_processing_terminal=False
+                        is_processing_nonterminal=False
                         current_rule.append(current_token)
                     else:
                         current_token.text+=char
             res_rules.append(current_rule)
+        return res_rules
 
 
 

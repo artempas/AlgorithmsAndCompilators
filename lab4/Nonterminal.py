@@ -1,14 +1,36 @@
-from dataclasses import dataclass
-from enum import Enum
+from dataclasses import dataclass, field
 from logging import getLogger
 
 logger = getLogger('Nonterminal')
 
 
-@dataclass
+@dataclass(frozen=True)
 class Token:
     isNonTerminal: bool
     text: str
+
+    def __lt__(self, other: 'Token'):
+        return self.text < other.text
+
+    def __eq__(self, other):
+        if isinstance(other, Token):
+            return super.__eq__(self, other)
+        if isinstance(other, str):
+            return self.text == other
+
+
+@dataclass
+class Rule:
+    rule: list[Token] = field(default_factory=list)
+    sync: bool = False
+
+    def __str__(self):
+        return ('Sync' if self.sync else '') + ''.join([
+            f"<{i.text}>" if i.isNonTerminal else f"'{i.text}'" for i in self.rule])
+
+    def __iter__(self):
+        for token in self.rule:
+            yield token
 
 
 class Nonterminal:
@@ -17,52 +39,52 @@ class Nonterminal:
         self.is_first = is_first
         self.name = name
         self.rules = self._parse_rules(rules)
-        print(f"Created Nonterminal {name}. Rules are: {self.rules}")
+        logger.debug(f"Created Nonterminal {name}. Rules are: {self.rules}")
 
-    def _parse_rules(self, rules: list[str]) -> list[list[Token]]:
+    def _parse_rules(self, rules: list[str]) -> list[Rule]:
         res_rules = []
         for rule in rules:
             current_rule = []
-            is_processing_terminal = False
             is_processing_nonterminal = False
-            current_token = None
+            is_processing_terminal = False
+            current_token = ''
             for char in rule:
-                if not (is_processing_terminal or is_processing_nonterminal):
-                    if char == '<':
-                        is_processing_nonterminal = True
-                        current_token = Token(isNonTerminal=True, text='')
-                        continue
-                    elif char == '\'':
-                        is_processing_terminal = True
-                        current_token = Token(isNonTerminal=False, text='')
-                        continue
-                    elif char != ' ':
-                        raise ValueError(f'Unexpected token {char} in rule {rule} (Terminal {self.name})')
-                    continue
-                if is_processing_terminal:
-                    if char == '\'':
-                        is_processing_terminal = False
-                        current_rule.append(current_token)
-                    else:
-                        current_token.text += char
-                        continue
                 if is_processing_nonterminal:
                     if char == '>':
                         is_processing_nonterminal = False
-                        current_rule.append(current_token)
+                        current_rule.append(Token(isNonTerminal=True, text=current_token))
+                        current_token = ''
                     else:
-                        current_token.text += char
-            res_rules.append(current_rule)
+                        current_token += char
+                elif is_processing_terminal:
+                    if char == '\'':
+                        is_processing_terminal = not is_processing_nonterminal
+                        current_rule.append(Token(isNonTerminal=False, text=current_token))
+                        continue
+                    else:
+                        current_token += char
+                        continue
+                else:
+                    if char == '\'':
+                        is_processing_terminal = not is_processing_nonterminal
+                        continue
+                    elif char == '<':
+                        is_processing_nonterminal = True
+                        continue
+                    else:
+                        logger.error(f"Unexpected char in rules {char.__repr__()}")
+            res_rules.append(Rule(current_rule))
         return res_rules
 
     @staticmethod
-    def first_for_rule(rule: list[Token], other_rules: dict[str, 'Nonterminal']) -> set[str]:
+    def first_for_rule(rule: Rule, other_nonterminals: dict[str, 'Nonterminal']) -> set[Token]:
+        rule = rule.rule
         if not rule:
-            return {'@'}
+            return {Token(isNonTerminal=False, text='@')}
         result = set()
         for i, token in enumerate(rule):
             if token.isNonTerminal:
-                other_first = other_rules[token.text].first(other_rules)
+                other_first = other_nonterminals[token.text].first(other_nonterminals)
                 if '@' not in other_first:
                     result = result.union(other_first)
                     break
@@ -71,15 +93,15 @@ class Nonterminal:
                         result = result.union(other_first)
                         break
                     else:  # Else try next one
-                        other_first.remove('@')
+                        other_first.remove(Token(False, '@'))
                         result = result.union(other_first)
                         continue
             else:
-                result.add(token.text)
+                result.add(token)
                 break
         return result
 
-    def first(self, other_rules: dict[str, 'Nonterminal']) -> set[str]:
+    def first(self, other_rules: dict[str, 'Nonterminal']) -> set[Token]:
         result = set()
         for rule in self.rules:
             result = result.union(self.first_for_rule(rule, other_rules))
@@ -89,24 +111,33 @@ class Nonterminal:
     def token(self) -> Token:
         return Token(isNonTerminal=True, text=self.name)
 
-    def follow(self, other_rules: dict[str, 'Nonterminal']) -> set[str]:
+    def follow(self, other_nonterminals: dict[str, 'Nonterminal']) -> set[Token]:
         follow = set()
         if self.is_first:
-            follow.add('$')
-        for nonterminal in other_rules.values():
+            follow.add(Token(isNonTerminal=False, text='$'))
+        for nonterminal in other_nonterminals.values():
             for rule in nonterminal.rules:
+                rule = rule.rule
                 try:
-                    if self.name=='statement' and nonterminal.name=='else':
+                    if self.name == 'statement' and nonterminal.name == 'else':
                         pass
                     token_position = rule.index(self.token)
                     subrule = rule[token_position + 1:]
-                    first_of_subrule = self.first_for_rule(subrule, other_rules)
+                    first_of_subrule = self.first_for_rule(Rule(subrule), other_nonterminals)
                     if '@' not in first_of_subrule:
                         follow = follow.union(first_of_subrule)
                     else:
-                        if self==nonterminal and first_of_subrule=={"@"}:
+                        if self == nonterminal and first_of_subrule == {"@"}:
                             continue
-                        follow = follow.union(nonterminal.follow(other_rules))
+                        follow = follow.union(nonterminal.follow(other_nonterminals))
                 except ValueError:  # If current nonterminal wasn't found in rule
                     continue
         return follow
+
+    def get_terminals(self) -> set[Token]:
+        terminals = set()
+        for rule in self.rules:
+            for token in rule.rule:
+                if not token.isNonTerminal:
+                    terminals.add(token)
+        return terminals

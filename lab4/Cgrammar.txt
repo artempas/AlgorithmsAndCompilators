@@ -6,7 +6,7 @@
 	| <declaration>';'
 	| '{' <statement> '}'
 	| <for> <statement>
-	| <if> <statement>' else' <statement>
+	| <if> <statement> 'else' <statement>
 	| <return>
 <declaration>: <type> <identifier> <assign>
 <identifier>: <character><id_end>

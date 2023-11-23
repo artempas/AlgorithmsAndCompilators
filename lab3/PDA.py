@@ -1,7 +1,7 @@
 import re
 from typing import Self
 
-from RestorePoint import RestorePoint
+from lab3.RestorePoint import RestorePoint
 from logging import getLogger
 
 logger = getLogger("PDA")

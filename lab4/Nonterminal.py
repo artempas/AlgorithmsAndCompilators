@@ -12,12 +12,6 @@ class Token:
     def __lt__(self, other: 'Token'):
         return self.text < other.text
 
-    def __eq__(self, other):
-        if isinstance(other, Token):
-            return super.__eq__(self, other)
-        if isinstance(other, str):
-            return self.text == other
-
 
 @dataclass
 class Rule:
@@ -45,35 +39,38 @@ class Nonterminal:
         res_rules = []
         for rule in rules:
             current_rule = []
-            is_processing_nonterminal = False
             is_processing_terminal = False
+            is_processing_nonterminal = False
             current_token = ''
             for char in rule:
+                if not (is_processing_terminal or is_processing_nonterminal):
+                    if char == '<':
+                        is_processing_nonterminal = True
+                        current_token =''
+                        continue
+                    elif char == '\'':
+                        is_processing_terminal = True
+                        current_token = ''
+                        continue
+                    elif char=='@':
+                        current_rule.append(Token(isNonTerminal=False, text='@'))
+                    elif char != ' ':
+                        raise ValueError(f'Unexpected token {char} in rule {rule} (Terminal {self.name})')
+                    continue
+                if is_processing_terminal:
+                    if char == '\'':
+                        is_processing_terminal = False
+                        current_rule.append(Token(isNonTerminal=False, text=current_token))
+                    else:
+                        current_token += char
+                        continue
                 if is_processing_nonterminal:
                     if char == '>':
                         is_processing_nonterminal = False
                         current_rule.append(Token(isNonTerminal=True, text=current_token))
-                        current_token = ''
                     else:
                         current_token += char
-                elif is_processing_terminal:
-                    if char == '\'':
-                        is_processing_terminal = not is_processing_nonterminal
-                        current_rule.append(Token(isNonTerminal=False, text=current_token))
-                        continue
-                    else:
-                        current_token += char
-                        continue
-                else:
-                    if char == '\'':
-                        is_processing_terminal = not is_processing_nonterminal
-                        continue
-                    elif char == '<':
-                        is_processing_nonterminal = True
-                        continue
-                    else:
-                        logger.error(f"Unexpected char in rules {char.__repr__()}")
-            res_rules.append(Rule(current_rule))
+            res_rules.append(Rule(rule=current_rule))
         return res_rules
 
     @staticmethod
@@ -111,27 +108,26 @@ class Nonterminal:
     def token(self) -> Token:
         return Token(isNonTerminal=True, text=self.name)
 
-    def follow(self, other_nonterminals: dict[str, 'Nonterminal']) -> set[Token]:
+    def follow(self, other_nonterminals: dict[str, 'Nonterminal'], ignore:'Nonterminal'=None) -> set[Token]:
         follow = set()
         if self.is_first:
             follow.add(Token(isNonTerminal=False, text='$'))
         for nonterminal in other_nonterminals.values():
             for rule in nonterminal.rules:
                 rule = rule.rule
-                try:
-                    if self.name == 'statement' and nonterminal.name == 'else':
-                        pass
-                    token_position = rule.index(self.token)
-                    subrule = rule[token_position + 1:]
+                last_token_position=0
+                for _ in range(rule.count(self.token)):
+                    last_token_position = rule.index(self.token, last_token_position)+1
+                    subrule = rule[last_token_position:]
                     first_of_subrule = self.first_for_rule(Rule(subrule), other_nonterminals)
-                    if '@' not in first_of_subrule:
+                    if '@' not in [i.text for i in first_of_subrule]:
                         follow = follow.union(first_of_subrule)
                     else:
-                        if self == nonterminal and first_of_subrule == {"@"}:
+                        if self == nonterminal and first_of_subrule == {Token(False, "@")}:
                             continue
-                        follow = follow.union(nonterminal.follow(other_nonterminals))
-                except ValueError:  # If current nonterminal wasn't found in rule
-                    continue
+                        follow=follow.union(first_of_subrule)
+                        if nonterminal!=ignore:
+                            follow = follow.union(nonterminal.follow(other_nonterminals, ignore=self))
         return follow
 
     def get_terminals(self) -> set[Token]:

@@ -1,6 +1,6 @@
 import os
 import re
-from PDA import PushdownAutomata
+from lab3.PDA import PushdownAutomata
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -18,8 +18,8 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
     @staticmethod
-    def print(text: str, color: str):
-        print(color + text + bcolors.ENDC)
+    def print(text: str, color: str, end='\n'):
+        print(color + text + bcolors.ENDC, end=end)
 
 
 def main():

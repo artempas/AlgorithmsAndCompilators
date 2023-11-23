@@ -8,12 +8,28 @@ import re
 logger = getLogger('Parser')
 
 
+class Stack(list):
+    def append(self, __object: '_T') -> None:
+        logger.debug(f"stack {self}<-{__object}")
+        super().append(__object)
+
+    def pop(self, __index: typing.SupportsIndex = ...) -> '_T':
+        obj = super().pop()
+        logger.debug(f"stack {self}->{obj}")
+        return obj
+
+
 class Parser:
     nonterminals: dict[str, Nonterminal]
-    NT_RULE = r"<(?P<nonterminal>[a-z_]+)>: (?P<rules>.*)?"
+    NT_RULE = r"<(?P<nonterminal>[a-z_]+)>: *(?P<rules>.*)?"
     NT_OR_RULE = r"\t\| (?P<rules>.+)"
     parsing_table: dict[Token, dict[Token, Rule]]
     syntax_analysis_table: dict[Token, dict[Token, Rule]]
+
+    class Error(typing.NamedTuple):
+        message: str
+        position: int
+        skipped: bool
 
     def __init__(self) -> None:
         self.syntax_analysis_table = {}
@@ -60,7 +76,7 @@ class Parser:
         found = re.match(self.NT_RULE, string)
         if found:
             rule_str = found.group('rules')
-            rules = rule_str.split('|') if rule_str else None
+            rules = rule_str.split('|') if rule_str else ['@']
             return found.group('nonterminal'), rules
         found = re.match(self.NT_OR_RULE, string)
         if found:
@@ -68,16 +84,22 @@ class Parser:
         raise ValueError(f'cannot parse string {string}')
 
     def __build_parsing_table(self) -> None:
-        table: dict[Token, dict[Token, Rule]] = {}  # [nonterminal][terminal
+        table: dict[Token, dict[Token, Rule]] = {}  # [nonterminal][terminal]
         for nonterminal in self.nonterminals.values():
             table[nonterminal.token] = {}
             for rule in nonterminal.rules:
                 first = Nonterminal.first_for_rule(rule, self.nonterminals)
-                if '@' not in first:
+                if '@' not in [i.text for i in first]:
                     for terminal in first:
                         table[nonterminal.token][terminal] = rule
                 else:
-                    raise NotImplementedError("Haven't done for @ in first")
+                    for terminal in first:
+                        if terminal.text != '@':
+                            table[nonterminal.token][terminal] = rule
+                    for terminal in nonterminal.follow(self.nonterminals):
+                        logger.debug(f'table[{nonterminal.token.text}][{terminal.text}]={rule}')
+                        table[nonterminal.token][terminal] = rule
+
         self.parsing_table = table
 
     @property
@@ -86,6 +108,7 @@ class Parser:
         for i in self.nonterminals.values():
             terminals = terminals.union(i.get_terminals())
         return terminals
+
     def print_table(self, table: dict[Token, dict[Token, Rule]], save_to_csv: str = None):
         terminals = sorted(list(self.terminals))
         pt = PrettyTable()
@@ -104,41 +127,98 @@ class Parser:
         self.syntax_analysis_table = self.parsing_table.copy()
         for nonterminal in self.nonterminals.values():
             for terminal in nonterminal.follow(self.nonterminals):
-                self.syntax_analysis_table[nonterminal.token][terminal] = Rule(sync=True)
+                current_rule = self.syntax_analysis_table[nonterminal.token].get(terminal)
+                if current_rule:
+                    self.syntax_analysis_table[nonterminal.token][terminal].sync = True
+                else:
+                    self.syntax_analysis_table[nonterminal.token][terminal] = Rule(sync=True)
             for terminal in nonterminal.first(self.nonterminals):
+                if terminal.text=='@':
+                    continue
                 self.syntax_analysis_table[nonterminal.token][terminal].sync = True
 
-    def test_string(self, string: str) -> list[str]:
+    def test_string(self, string: str) -> list[Error]:
         """
         Parses string, returns errors
         """
-        stack = [Token(False, '$'), Token(True, 'program')]
+
+        stack = Stack([Token(False, '$'), Token(True, 'program')])
         errors = []
         position = 0
         in_panic = False
+
+        def panic_mode():
+            nonlocal position, in_panic
+            while position <= len(string) and in_panic:
+                errors.append(self.Error('', position, True))
+                while string[position] in (' ', '\n') and position < len(string):
+                    position += 1
+                next_terminal = self._find_next_terminal(string[position:])
+                new_rule = self.syntax_analysis_table[stack_element].get(next_terminal)
+                if new_rule:
+                    if new_rule.sync:
+                        position += 1
+                        in_panic = False
+                position += 1
+
         while position < len(string):
-            next_terminal=None
+            next_terminal = None
             try:
-                next_terminal = self._find_next_terminal(string)
+                while string[position] in (' ', '\n') and position < len(string):
+                    position += 1
+                next_terminal = self._find_next_terminal(string[position:])
             except ValueError:
-                errors.append(f'Unexpected symbol {string[position]} at position {position}')
-                position+=1
+                errors.append(self.Error('Not found terminal', position, False))
+                position += 1
                 continue
             stack_element = stack.pop()
             if stack_element.isNonTerminal:
-                new_rule=self.syntax_analysis_table[stack_element].get(next_terminal)
-                # TODO STOPPED HERE
-            else:
-                if stack_element == str_el:
+                new_rule = self.syntax_analysis_table[stack_element].get(next_terminal)
+                if new_rule:
+                    if new_rule.rule:
+                        for token in new_rule.rule[::-1]:
+                            stack.append(token)
+                        continue
+                    else:
+                        assert new_rule.sync
+                        errors.append(
+                            self.Error(f'Next rule not found for {stack_element.text}[{next_terminal.text}] (synch)',
+                                       position, False))
+                        stack.pop()
+                        position += 1
+                        continue
+                else:
+                    in_panic = True
+                    errors.append(
+                        self.Error(f'Next rule not found for {stack_element.text}[{next_terminal.text}]', position,
+                                   False))
                     position += 1
+                    panic_mode()
+                    continue
+            else:
+                if stack_element == next_terminal:
+                    position += len(next_terminal.text)
+                elif stack_element==Token(False, "@"):
+                    continue
                 else:
                     '''PANICCCCC'''
-                    errors.append(f'Unexpected character {str_el} at position {position}')
+                    errors.append(
+                        self.Error(f'Unexpected symbol (expected {stack_element.text} got {string[position]}', position,
+                                   False))
+                    in_panic = True
                     position += 1
+                    while not stack_element.isNonTerminal:
+                        if not stack:
+                            errors += [self.Error('', i, True) for i in range(position, len(string))]
+                            return errors
+                        stack_element = stack.pop()
+                    panic_mode()
+                    continue
+        errors+=[self.Error(f"Expected {i.text}" , -1, False) for i in stack[1:][::-1]]
         return errors
 
-    def _find_next_terminal(self, string:str)->Token:
+    def _find_next_terminal(self, string: str) -> Token:
         for terminal in sorted(list(self.terminals), key=lambda token: len(token.text), reverse=True):
             if string.startswith(terminal.text):
                 return terminal
-        raise ValueError('Unexpected terminal')
+        raise ValueError(f'Unable to find next terminal in {string.__repr__()}')

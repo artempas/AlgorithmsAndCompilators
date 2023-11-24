@@ -26,7 +26,7 @@ def main():
                 continue
             if errors:
                 if errors[err_cnt].position == text_pos:
-                    color = bcolors.WARNING if errors[err_cnt].skipped else bcolors.FAIL
+                    color = bcolors.FAIL
                     if errors[err_cnt].message:
                         line_errors.append(errors[err_cnt].message)
                     if program_text[text_pos]!='\n':

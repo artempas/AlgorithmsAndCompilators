@@ -37,7 +37,7 @@ class Parser:
         self.nonterminals = {}
 
     @classmethod
-    def from_file(cls, filename) -> typing.Self:
+    def from_file(cls, filename):
         instance = Parser()
         with open(filename) as file:
             current_ruleset: list[str] = []
@@ -164,7 +164,7 @@ class Parser:
         while position < len(string):
             next_terminal = None
             try:
-                while string[position] in (' ', '\n') and position < len(string):
+                while string[position] in (' ', '\n') and position < len(string)-1:
                     position += 1
                 next_terminal = self._find_next_terminal(string[position:])
             except ValueError:
@@ -203,7 +203,7 @@ class Parser:
                 else:
                     '''PANICCCCC'''
                     errors.append(
-                        self.Error(f'Unexpected symbol (expected {stack_element.text} got {string[position]}', position,
+                        self.Error(f'Unexpected symbol (expected {stack_element.text} got {string[position]})', position,
                                    False))
                     in_panic = True
                     position += 1

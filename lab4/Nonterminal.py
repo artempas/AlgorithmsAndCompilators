@@ -4,13 +4,25 @@ from logging import getLogger
 logger = getLogger('Nonterminal')
 
 
+def get_from_string(string: str, i: int) -> str | None:
+    if len(string) - 1 < i:
+        return None
+    return string[i]
+
+
 @dataclass(frozen=True)
 class Token:
     isNonTerminal: bool
     text: str
+    is_reversed: bool = False
 
     def __lt__(self, other: 'Token'):
         return self.text < other.text
+
+    def test(self, string: str) -> bool:
+        if self.isNonTerminal:
+            return False
+        return string != self.text if self.is_reversed else string == self.text
 
 
 @dataclass
@@ -41,19 +53,22 @@ class Nonterminal:
             current_rule = []
             is_processing_terminal = False
             is_processing_nonterminal = False
+            is_ignore_rule = False
             current_token = ''
-            for char in rule:
+            for i, char in enumerate(rule):
                 if not (is_processing_terminal or is_processing_nonterminal):
                     if char == '<':
                         is_processing_nonterminal = True
-                        current_token =''
+                        current_token = ''
                         continue
                     elif char == '\'':
                         is_processing_terminal = True
                         current_token = ''
                         continue
-                    elif char=='@':
+                    elif char == '@':
                         current_rule.append(Token(isNonTerminal=False, text='@'))
+                    elif char == '!' and get_from_string(rule, i + 1) == "<":
+                        is_ignore_rule = True
                     elif char != ' ':
                         raise ValueError(f'Unexpected token {char} in rule {rule} (Terminal {self.name})')
                     continue
@@ -67,7 +82,8 @@ class Nonterminal:
                 if is_processing_nonterminal:
                     if char == '>':
                         is_processing_nonterminal = False
-                        current_rule.append(Token(isNonTerminal=True, text=current_token))
+                        current_rule.append(Token(isNonTerminal=True, text=current_token, is_reversed=is_ignore_rule))
+                        is_ignore_rule = False
                     else:
                         current_token += char
             res_rules.append(Rule(rule=current_rule))
@@ -108,16 +124,16 @@ class Nonterminal:
     def token(self) -> Token:
         return Token(isNonTerminal=True, text=self.name)
 
-    def follow(self, other_nonterminals: dict[str, 'Nonterminal'], ignore:'Nonterminal'=None) -> set[Token]:
+    def follow(self, other_nonterminals: dict[str, 'Nonterminal'], ignore: 'Nonterminal' = None) -> set[Token]:
         follow = set()
         if self.is_first:
             follow.add(Token(isNonTerminal=False, text='$'))
         for nonterminal in other_nonterminals.values():
             for rule in nonterminal.rules:
                 rule = rule.rule
-                last_token_position=0
+                last_token_position = 0
                 for _ in range(rule.count(self.token)):
-                    last_token_position = rule.index(self.token, last_token_position)+1
+                    last_token_position = rule.index(self.token, last_token_position) + 1
                     subrule = rule[last_token_position:]
                     first_of_subrule = self.first_for_rule(Rule(subrule), other_nonterminals)
                     if '@' not in [i.text for i in first_of_subrule]:
@@ -125,8 +141,8 @@ class Nonterminal:
                     else:
                         if self == nonterminal and first_of_subrule == {Token(False, "@")}:
                             continue
-                        follow=follow.union(first_of_subrule)
-                        if nonterminal!=ignore:
+                        follow = follow.union(first_of_subrule)
+                        if nonterminal != ignore:
                             follow = follow.union(nonterminal.follow(other_nonterminals, ignore=self))
         return follow
 

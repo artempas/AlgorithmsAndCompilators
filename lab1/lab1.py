@@ -50,7 +50,7 @@ class Expression:
             for operand in operands:
                 new_operands += operand.split(operation.value)
             operands = new_operands
-        print(f"{operands=}")
+        # print(f"{operands=}")
         for operand in operands:
             if not operand:
                 raise Exception("No operand found for operation")
@@ -59,19 +59,19 @@ class Expression:
 
     def iterate_over_operations(self, regex):
         while re.search(regex, self.expression):
-            print(f"Iterator got string {self.expression}")
+            # print(f"Iterator got string {self.expression}")
             yield re.search(regex, self.expression).groups()
-            print("passed")
-        print(f"exited with {self.expression}")
+            # print("passed")
+        # print(f"exited with {self.expression}")
 
     def parse_expression(self):
-        print(f"Parsing {self.expression=}")
+        # print(f"Parsing {self.expression=}")
         if self.expression.isdigit() or re.match(r"^[0-9]+\.[0-9]+$", self.expression):
             self.operation = Operation.NONE
             regex = r"^[0-9]+\.[0-9]+$"
-            print(
-                f"Set operation to NONE for {self.expression} [{self.expression.isdigit()=}, {re.match(regex, self.expression)}]"
-            )
+            # print(
+            #     f"Set operation to NONE for {self.expression} [{self.expression.isdigit()=}, {re.match(regex, self.expression)}]"
+            # )
             return
 
         brackets_stack = []
@@ -93,18 +93,18 @@ class Expression:
                     current_bracket = ""
             if brackets_stack:
                 current_bracket += char
-        print(expression_copy, self.child_expressions)
+        # print(expression_copy, self.child_expressions)
         if brackets_stack:
             raise IndexError("Wrong brackets")
         self.expression = expression_copy
-        print(f"checking if unMinus {self.expression=}")
+        # print(f"checking if unMinus {self.expression=}")
         if re.match(r"^-[0-9]+(?:\.[0-9]+)?|-[A-Z]", self.expression):
             self.operation = Operation.NEGATIVE
             self.expression = self.expression[1:]
             return
 
     def calculate_expression(self) -> float:
-        print(f"calculating expression {self.expression} {self.operation} {self.child_expressions}")
+        # print(f"calculating expression {self.expression} {self.operation} {self.child_expressions}")
         if self.operation is not None:
             if self.operation == Operation.NONE:
                 return float(self.expression)
@@ -118,19 +118,19 @@ class Expression:
                     calc.parse_expression()
                     self.expression = calc.calculate_expression()
                 return 0 - float(self.expression)
-        print("CALCULATING POW")
-        for op1, op2 in self.iterate_over_operations(r"([0-9]+\.[0-9]+|[0-9]|[A-Z])\^([0-9]+\.[0-9]+|[0-9]+|[A-Z])"):
+        # print("CALCULATING POW")
+        for op1, op2 in self.iterate_over_operations(r"([0-9]+\.[0-9]+|[0-9]+|[A-Z])\^([0-9]+\.[0-9]+|[0-9]+|[A-Z])"):
             op1, op2 = self.decode_values(op1, op2)
             self.insert_value(op1, "^", op2)
-        print("CALCULATING */")
+        # print("CALCULATING */")
         for op1, operator, op2 in self.iterate_over_operations(
-            r"([0-9]+\.[0-9]+|[0-9]|[A-Z])([*/])([0-9]+\.[0-9]+|[0-9]+|[A-Z])"
+            r"([0-9]+\.[0-9]+|[0-9]+|[A-Z])([*/])([0-9]+\.[0-9]+|[0-9]+|[A-Z])"
         ):
             op1, op2 = self.decode_values(op1, op2)
             self.insert_value(op1, operator, op2)
-        print("CALCULATING +-")
+        # print("CALCULATING +-")
         for op1, operator, op2 in self.iterate_over_operations(
-            r"([0-9]+\.[0-9]+|[0-9]|[A-Z])([-+])([0-9]+\.[0-9]+|[0-9]|[A-Z])"
+            r"([0-9]+\.[0-9]+|[0-9]+|[A-Z])([-+])([0-9]+\.[0-9]+|[0-9]+|[A-Z])"
         ):
             op1, op2 = self.decode_values(op1, op2)
             self.insert_value(op1, operator, op2)

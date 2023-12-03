@@ -2,18 +2,18 @@ import typing
 from logging import getLogger
 from prettytable import PrettyTable
 
-from Nonterminal import Nonterminal, Token, Rule
+from lab4.Nonterminal import Nonterminal, Token, Rule
 import re
 
 logger = getLogger('Parser')
 
 
-class Stack(list):
-    def append(self, __object: '_T') -> None:
+class Stack(list[Token]):
+    def append(self, __object: Token) -> None:
         logger.debug(f"stack {self}<-{__object}")
         super().append(__object)
 
-    def pop(self, __index: typing.SupportsIndex = ...) -> '_T':
+    def pop(self, __index: typing.SupportsIndex = ...) -> Token:
         obj = super().pop()
         logger.debug(f"stack {self}->{obj}")
         return obj
@@ -22,7 +22,7 @@ class Stack(list):
 class Parser:
     nonterminals: dict[str, Nonterminal]
     NT_RULE = r"<(?P<nonterminal>[a-z_]+)>: *(?P<rules>.*)?"
-    NT_OR_RULE = r"\t\| (?P<rules>.+)"
+    NT_OR_RULE = r"\s*\|\s*(?P<rules>.+)"
     parsing_table: dict[Token, dict[Token, Rule]]
     syntax_analysis_table: dict[Token, dict[Token, Rule]]
 

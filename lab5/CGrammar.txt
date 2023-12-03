@@ -6,22 +6,23 @@
 <number_end>:
   | <digit><number_end>
 <number>: <digit><number_end>
-<expression>: <term> '+' <expression>
-|  <term>  '-' <expression>
-|  <term>
-<term>: <factor> '*' < term >
-| <factor> '/' < term >
-| <factor>
+<expression>: <term> <expression_end>
+<expression_end>:
+| '+' <expression>
+| '-' <expression>
+<term>: <factor> <term_end>
+<term_end>:
+| '*' <term>
+| '/' <term>
 <factor>: <identifier> | <number> | '('<expression>')'
 <relop>:  '<' | '>' | '==' | '!='
 <bool_expression>: <expression>   <relop>    <expression>
 <assign>: <identifier> '=' <expression> ';'
-<string>: '"' '"'
-<print>: 'print' <print_end> ';'
-<print_end>: <string>
-| <expression>
-| <string> ',' <print_end>
-| <expression> ',' <print_end>
+<string>: '"'
+<print>: 'print' <string_or_expr> <print_end> ';'
+<print_end>:
+| ',' <string_or_expr> <print_end>
+<string_or_expr>: <string> | <expression>
 <scan>: 'scan' <identifier> ';'
 <for>: 'for' <identifier> '=' <expression> 'to' <expression>
 <if>: 'if' <bool_expression>
@@ -31,7 +32,6 @@
   | <print> <statement>
   | <scan> <statement>
   | <assign> <statement>
-  | <for>  '{' <statement> '}'
-  | <if>  '{' <statement> '}' <else>
+  | <for>  '{' <statement> '}' <statement>
+  | <if>  '{' <statement> '}' <else> <statement>
 <program>: <statement>
-<char>:

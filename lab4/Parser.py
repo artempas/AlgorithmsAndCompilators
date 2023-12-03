@@ -157,23 +157,26 @@ class Parser:
                 new_rule = self.syntax_analysis_table[stack_element].get(next_terminal)
                 if new_rule:
                     if new_rule.sync:
-                        position += 1
+                        # position += 1
                         in_panic = False
+                        break
                 position += 1
 
         while position < len(string):
+
             next_terminal = None
             try:
                 while string[position] in (' ', '\n') and position < len(string)-1:
                     position += 1
                 next_terminal = self._find_next_terminal(string[position:])
-            except ValueError:
+            except ValueError as e:
+                print(e)
                 errors.append(self.Error('Not found terminal', position, False))
                 position += 1
                 continue
             stack_element = stack.pop()
             if stack_element.isNonTerminal:
-                new_rule = self.syntax_analysis_table[stack_element].get(next_terminal)
+                new_rule = self.syntax_analysis_table[stack_element].get(next_terminal if not next_terminal.text.startswith('"') else Token(False,'"'))
                 if new_rule:
                     if new_rule.rule:
                         for token in new_rule.rule[::-1]:
@@ -196,7 +199,7 @@ class Parser:
                     panic_mode()
                     continue
             else:
-                if stack_element == next_terminal:
+                if stack_element == next_terminal or (next_terminal.text.startswith('"') and stack_element.text=='"'):
                     position += len(next_terminal.text)
                 elif stack_element==Token(False, "@"):
                     continue
@@ -218,7 +221,16 @@ class Parser:
         return errors
 
     def _find_next_terminal(self, string: str) -> Token:
+        if not string or string in (' ', '\n') :
+            return Token(False, "@")
         for terminal in sorted(list(self.terminals), key=lambda token: len(token.text), reverse=True):
             if string.startswith(terminal.text):
+                if terminal.text=='"':
+                    cur_terminal_text='"'
+                    for char in string[1:]:
+                        cur_terminal_text+=char
+                        if char=='"':
+                            break
+                    return Token(False,cur_terminal_text)
                 return terminal
         raise ValueError(f'Unable to find next terminal in {string.__repr__()}')

@@ -9,7 +9,8 @@ def main():
         for i in errors:
             print(i)
     else:
-        with open('test1.txt', encoding='utf-8') as file:
+        print("No syntax errors found")
+        with open('./lab5/test1.txt', encoding='utf-8') as file:
             instructions = parser.process_program(file.read())
             variables = {}
             if_succeed = None

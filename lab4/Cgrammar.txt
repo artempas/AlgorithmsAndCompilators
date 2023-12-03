@@ -28,4 +28,4 @@
 <if>: 'if''('<bool_expression>')'
 <return>: 'return' <number>';'
 <else>:
-	| ' else' <statement>
+	| 'else' <statement>

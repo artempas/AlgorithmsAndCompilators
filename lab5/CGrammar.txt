@@ -16,6 +16,10 @@
 | '/' <term>
 <factor>: <identifier> | <number> | '('<expression>')'
 <relop>:  '<' | '>' | '==' | '!='
+<bool_composite>: <bool_expression> <bool_composite_end>
+<bool_composite_end>: 
+| <binop> <bool_expression> <bool_composite_end>
+<binop>: 'and'|'or'
 <bool_expression>: <expression>   <relop>    <expression>
 <assign>: <identifier> '=' <expression> ';'
 <string>: '"'
@@ -25,7 +29,7 @@
 <string_or_expr>: <string> | <expression>
 <scan>: 'scan' <identifier> ';'
 <for>: 'for' <identifier> '=' <expression> 'to' <expression>
-<if>: 'if' <bool_expression>
+<if>: 'if' <bool_composite>
 <else>: 
 | 'else' '{' <statement> '}'
 <statement>:  

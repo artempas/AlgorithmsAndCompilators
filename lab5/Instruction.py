@@ -107,19 +107,26 @@ class Instruction:
 
     def process_if(self) -> bool:
         bool_expr = self.instruction.replace('if', '').replace(' ', '')
-        matches = re.search('([0-9a-z_+-/*]+)([<>]|==|!=)([0-9a-z_+-/*]+)', bool_expr, re.RegexFlag.IGNORECASE)
-        operand1, operator, operand2 = self._calc(self._insert_variables(matches.group(1))), matches.group(
-            2), self._calc(self._insert_variables(matches.group(3)))
-        bool_res = False
-        match operator:
-            case ">":
-                bool_res = operand1 > operand2
-            case "<":
-                bool_res = operand1 < operand2
-            case "==":
-                bool_res = operand1 == operand2
-            case "!=":
-                bool_res = operand1 != operand2
+        conditions=[i.split('and') for i in bool_expr.split('or')]
+        bool_res=False
+        for or_cond in conditions:
+            and_res=True
+            for and_cond in or_cond:
+                matches = re.search('([0-9a-z_+-/*]+)([<>]|==|!=)([0-9a-z_+-/*]+)', and_cond, re.RegexFlag.IGNORECASE)
+                operand1, operator, operand2 = self._calc(self._insert_variables(matches.group(1))), matches.group(
+                2), self._calc(self._insert_variables(matches.group(3)))
+                match operator:
+                    case ">":
+                        op_res = operand1 > operand2
+                    case "<":
+                        op_res = operand1 < operand2
+                    case "==":
+                        op_res = operand1 == operand2
+                    case "!=":
+                        op_res = operand1 != operand2
+                and_res=and_res and op_res
+            bool_res=bool_res or and_res
+
         if bool_res:
             self.__process_body()
         return bool_res

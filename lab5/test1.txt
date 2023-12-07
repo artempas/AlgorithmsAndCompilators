@@ -2,15 +2,12 @@ print "INPUT a";
 scan a;
 print "INPUT b";
 scan b;
-for i=0 to a{
-    for j=0 to b{
-        if i>j{
-            print "if",i,j,i-j;
-        }
-        else{
-            print "else",i,j,j-i;
-        }
-        j=j+1;
-    }
-    i=i+1;
+if a>b or a==b{
+    print a, ">=", b;
 }
+if a==b and a==0{
+    print "a==b==0";
+}
+if a==5 and b==6{
+    print "a>b or a==b==0";
+}  

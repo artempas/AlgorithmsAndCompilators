@@ -217,6 +217,11 @@ class Parser:
                         stack_element = stack.pop()
                     panic_mode()
                     continue
+        while len(stack)>1:
+            if self.syntax_analysis_table[stack[-1]].get(Token(False,'@')):
+                stack.pop()
+            else:
+                break
         errors+=[self.Error(f"Expected {i.text}" , -1, False) for i in stack[1:][::-1]]
         return errors
 

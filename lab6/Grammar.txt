@@ -1,0 +1,35 @@
+<program>: <block> <program_end>
+<program_end>:
+    | <block> <program_end>
+<block>: '<block' <block_params> '>' <block_content> '</block>'
+<block_params>:
+    | 'rows' '=' <number> <block_params>
+    | 'columns' '=' <number> <block_params>
+    | 'height' '=' <number> <block_params>
+<number>: <digit><number_end>
+<digit>: '0' | '1' | '2' | '3' | '4' |  '5' | '6' | '7' | '8' | '9'
+<number_end>:
+    | <digit><number_end>
+<block_content>: <column> <column_end>
+<column>: '<column ' <column_params> '>' <column_content> '</column>'
+<column_params>:
+    | 'valign' '=' <valign> <column_params>
+    | 'halign' '=' <halign> <column_params>
+    | 'textcolor' '=' <number> <column_params>
+    | 'bgcolor' '=' <number> <column_params>
+    | 'width' '=' <number> <column_params>
+<halign>: 'left' | 'center' | 'right'
+<valign>: 'top' | 'center' | 'bottom' 
+<column_content>: <row> <row_end>
+<row>: '<row' <row_params> '>' <row_content> '</row>'
+<row_params>: 
+    | 'valign' '=' <valign> <row_params>
+    | 'halign' '=' <halign> <row_params>
+    | 'textcolor' '=' <number> <row_params>
+    | 'bgcolor' '=' <number> <row_params>
+    | 'height' '=' <number> <row_params>
+<row_content>: <block>| '"'
+<row_end>: 
+    | <row> <row_end>
+<column_end>:
+    | <column> <column_end>

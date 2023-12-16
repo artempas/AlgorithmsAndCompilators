@@ -1,0 +1,44 @@
+<block rows=3 columns=3>
+    <column valign=top halign=left textcolor=2 bgcolor=1 width=20>
+        <row                textcolor=3 bgcolor=2 height=20>"LEFT TOP"</row>
+        <row valign=center  textcolor=3 bgcolor=2 height=50>"LEFT CENTER"</row>
+        <row valign=bottom  textcolor=3 bgcolor=2 height=30>"LEFT BOTTOM"</row>
+    </column>
+    <column valign=center halign=center textcolor=2 bgcolor=1 width=20>
+        <row valign=top     textcolor=3 bgcolor=2 height=20>"CENTER TOP"</row>
+        <row                textcolor=3 bgcolor=2 height=20>"CENTER CENTER"</row>
+        <row valign=bottom  textcolor=3 bgcolor=2 height=60>"CENTER BOTTOM"</row>
+    </column>
+    <column valign=bottom halign=right textcolor=2 bgcolor=1 width=60>
+        <row valign=top     textcolor=3 bgcolor=2 height=15>"RIGHT TOP"</row>
+        <row valign=center  textcolor=3 bgcolor=2 height=25>"RIGHT CENTER"</row>
+        <row                textcolor=3 bgcolor=2 height=60>
+            <block rows=2 columns=3>
+                <column valign=top halign=left textcolor=2 bgcolor=1 width=33>
+                    <row                textcolor=3 bgcolor=2 height=20>"LEFT TOP1"</row>
+                    <row valign=center  textcolor=3 bgcolor=2 height=40>"LEFT CENTER1"</row>
+                </column>
+                <column valign=top halign=center textcolor=2 bgcolor=1 width=33>
+                    <row                textcolor=3 bgcolor=2 height=30>"CENTER TOP1"</row>
+                    <row valign=center  textcolor=3 bgcolor=2 height=30>"CENTER CENTER1"</row>
+                </column>
+                <column valign=top halign=right textcolor=2 bgcolor=1 width=34>
+                    <row                textcolor=3 bgcolor=2 height=30>"RIGHT TOP1"</row>
+                    <row valign=center  textcolor=3 bgcolor=2 height=30>"RIGHT CENTER1"</row>
+                </column>
+            </block>
+        </row>
+    </column>
+</block>
+<block rows=3 columns=2>
+    <column valign=center halign=center textcolor=2 bgcolor=1 width=50>
+        <row valign=top     textcolor=3 bgcolor=2 height=33>"CENTER TOP"</row>
+        <row                textcolor=3 bgcolor=2 height=33>"CENTER CENTER"</row>
+        <row valign=bottom  textcolor=3 bgcolor=2 height=34>"CENTER BOTTOM"</row>
+    </column>
+    <column valign=bottom halign=right textcolor=2 bgcolor=1 width=50>
+        <row valign=top     textcolor=3 bgcolor=2 height=33>"RIGHT TOP"</row>
+        <row valign=center  textcolor=3 bgcolor=2 height=33>"RIGHT CENTER"</row>
+        <row                textcolor=3 bgcolor=2 height=34>"RIGHT BOTTOM"</row>
+    </column>
+</block>

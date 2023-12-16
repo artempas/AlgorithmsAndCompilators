@@ -153,7 +153,12 @@ class Parser:
                 errors.append(self.Error('', position, True))
                 while string[position] in (' ', '\n') and position < len(string):
                     position += 1
-                next_terminal = self._find_next_terminal(string[position:])
+                try:
+                    next_terminal = self._find_next_terminal(string[position:])
+                except ValueError as e:
+                    errors.append(self.Error('Not found terminal', position, False))
+                    position += 1
+                    continue
                 new_rule = self.syntax_analysis_table[stack_element].get(next_terminal)
                 if new_rule:
                     if new_rule.sync:
@@ -170,7 +175,6 @@ class Parser:
                     position += 1
                 next_terminal = self._find_next_terminal(string[position:])
             except ValueError as e:
-                print(e)
                 errors.append(self.Error('Not found terminal', position, False))
                 position += 1
                 continue

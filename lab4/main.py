@@ -5,7 +5,7 @@ from lab3.main import bcolors
 
 def main(grammar=None, filename=None, _print=True):
     logging.basicConfig(level=logging.DEBUG)
-    parser = Parser.from_file(grammar or './Cgrammar.txt')
+    parser = Parser.from_file(grammar or './lab4/Cgrammar.txt')
     if _print:
         parser.print_all_firsts()
         parser.print_all_follows()
@@ -15,7 +15,7 @@ def main(grammar=None, filename=None, _print=True):
     if _print:
         print('\nSyntax analysis table')
         parser.print_table(parser.syntax_analysis_table, save_to_csv='syntax_analysis.csv')
-    with open(filename or 'test2.txt') as file:
+    with open(filename or 'lab4/test1.txt') as file:
         program_text = file.read()
         errors = parser.test_string(program_text)
         if not _print:

@@ -15,13 +15,18 @@
 <column_params>:
     | 'valign' '=' <valign> <column_params>
     | 'halign' '=' <halign> <column_params>
-    | 'textcolor' '=' <number> <column_params>
-    | 'bgcolor' '=' <number> <column_params>
+    | 'textcolor' '=' <hex> <column_params>
+    | 'bgcolor' '=' <hex> <column_params>
     | 'width' '=' <number> <column_params>
 <halign>: 'left' | 'center' | 'right'
 <valign>: 'top' | 'center' | 'bottom' 
 <column_content>: <row> <row_end>
 <row>: '<row' <row_params> '>' <row_content> '</row>'
+<character>: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' | '_'
+<hex>: <character> <hex_end> | <number> <hex_end>
+<hex_end>: 
+    | <character> <hex_end> 
+    | <number> <hex_end>
 <row_params>: 
     | 'valign' '=' <valign> <row_params>
     | 'halign' '=' <halign> <row_params>

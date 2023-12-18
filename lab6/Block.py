@@ -27,8 +27,8 @@ class Cell():
         self.halign = halign
         self.width: int = width
         self.height: int = height
-        self.bgcolor: int = bgcolor
-        self.textcolor: int = textcolor
+        self.bgcolor: str = bgcolor
+        self.textcolor: str = textcolor
         self.content: str | Block = ''
 
     def get_lines(self) -> list[str]:
@@ -60,6 +60,8 @@ class Cell():
                 border:1px solid black;
                 width:100%;
                 display:flex;
+                background-color: #{self.bgcolor};
+                color: #{self.textcolor};
                 align-items: {ALIGN_MAP[self.valign]};
                 justify-content: {ALIGN_MAP[self.halign]}
                 ">{content}</div>"""
